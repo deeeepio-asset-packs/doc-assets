@@ -4,7 +4,7 @@ import os
 import re
 
 OLD_PATH = './images/skins/' 
-NEW_PATH = './images/skons/' 
+NEW_PATH = './images/skans/' 
 ADDITION = 'custom/' 
 
 ASSET_REGEX = '\A(?P<file_name>.+?)\.(?P<file_type>[a-zA-Z0-9]+)\Z'
@@ -137,6 +137,10 @@ with os.scandir(OLD_PATH) as iterator:
                     print(f'{stripped}: {new_path}') 
                     
                     renames[old_path] = new_path
+
+                    print(old_path) 
+
+                    #shutil.copy(old_path, new_path) 
                 else: 
                     missing.append(stripped) 
 
@@ -161,3 +165,8 @@ with os.scandir(OLD_PATH) as iterator:
 
     for name, replacement in renames.items(): 
         print(f'{name}: {replacement}') 
+
+        shutil.copy(name, replacement) 
+
+        with open(replacement, mode='rb') as f: 
+            assert f.read() 
