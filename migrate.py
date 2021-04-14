@@ -60,7 +60,7 @@ def map_skins():
 
     for skin in skins_list: 
         name = skin['name'] 
-        compressed = name.replace(' ', '').replace("'", '').replace('’', '')
+        compressed = name.replace(' ', '').replace("'", '').replace('’', '').replace('-', '')
         lowered = compressed.lower() 
 
         asset_name = skin['asset'] 
@@ -110,11 +110,16 @@ with os.scandir(OLD_PATH) as iterator:
 
                 if stripped in mapping: 
                     display = new_name = mapping[stripped] 
+
+                    key = stripped
                 else: 
                     find_count = 0
 
+                    key = None
+
                     for name, replacement in mapping.items(): 
                         if stripped in name: 
+                            key = name
                             potential_new_name = replacement
                             find_count += 1
                         
@@ -122,9 +127,12 @@ with os.scandir(OLD_PATH) as iterator:
                         new_name = potential_new_name
                         display = new_name + ' (searched)' 
                     else: 
+                        key = None
+
                         print(find_count) 
                 
                 if new_name: 
+                    del mapping[key] 
                     #print(f'{stripped}: {display}') 
 
                     new_path = NEW_PATH
@@ -163,10 +171,20 @@ with os.scandir(OLD_PATH) as iterator:
 
     print() 
 
+    counts = {} 
+
     for name, replacement in renames.items(): 
         print(f'{name}: {replacement}') 
 
         shutil.copy(name, replacement) 
 
-        with open(replacement, mode='rb') as f: 
-            assert f.read() 
+        if replacement not in counts: 
+            counts[replacement] = [] 
+        
+        counts[replacement].append(name) 
+
+    for val in counts.values(): 
+        if len(val) > 1: 
+            print(val) 
+    
+    print(mapping) 
